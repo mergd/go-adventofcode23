@@ -22,62 +22,63 @@ func main() {
 		println(iterator + 1)
 		strs := strings.Split(gamestr, ":")
 		var validGame bool = true
-		for _, round := range strings.Split(strs[1], ";") {
-			valid, powercube := processGame(round)
-			if !valid && validGame {
-				println("game knocked out", iterator)
-				validGame = false
-			} else if validGame {
-				powerCubeSum += powercube
-			}
-		}
 
-		if validGame {
+		valid, powercube := processGame(strs[1])
+		powerCubeSum += powercube
+		if !valid && validGame {
+			println("game knocked out", iterator)
+			validGame = false
+		} else if validGame {
 			sum += iterator + 1
 			println("game added", sum)
 		}
 	}
 
 	println(sum)
+	println(powerCubeSum)
 
 }
 
 func processGame(input string) (bool, int) {
+
 	// println(input)
 	var isValid bool = true
 	var cubeNum = [3]int{0, 0, 0}
-	for _, cube := range strings.Split(input, ",") {
-		// println("Cube ", cube)
-		var numb int
-		re := regexp.MustCompile("[0-9]+")
-		match := re.FindString(cube)
-		if match != "" {
-			num, err := strconv.Atoi(match)
-			if err != nil {
-				log.Fatal(err)
+	for _, round := range strings.Split(input, ";") {
+
+		for _, cube := range strings.Split(round, ",") {
+			// println("Cube ", cube)
+			var numb int
+			re := regexp.MustCompile("[0-9]+")
+			match := re.FindString(cube)
+			if match != "" {
+				num, err := strconv.Atoi(match)
+				if err != nil {
+					log.Fatal(err)
+				}
+				numb = num
 			}
-			numb = num
+
+			if strings.Contains(cube, "red") {
+				if cubeNum[0] < numb {
+					cubeNum[0] = numb
+				}
+			} else if strings.Contains(cube, "green") {
+				if cubeNum[1] < numb {
+					cubeNum[1] = numb
+				}
+
+			} else if strings.Contains(cube, "blue") {
+				if cubeNum[2] < numb {
+					cubeNum[2] = numb
+				}
+
+			}
 		}
-
-		if strings.Contains(cube, "red") && numb <= 12 {
-			if cubeNum[0] < numb {
-				cubeNum[0] = numb
-			}
-		} else if strings.Contains(cube, "green") && numb <= 13 {
-			if cubeNum[1] < numb {
-				cubeNum[1] = numb
-			}
-
-		} else if strings.Contains(cube, "blue") && numb <= 14 {
-			if cubeNum[2] < numb {
-				cubeNum[2] = numb
-			}
-
-		} else {
-
-			isValid = false
-		}
-
 	}
-	return isValid
+	cubenum := cubeNum[0] * cubeNum[1] * cubeNum[2]
+	println("cubenum", cubeNum[0], cubeNum[1], cubeNum[2], cubenum)
+
+	return isValid, cubenum
+
 }
